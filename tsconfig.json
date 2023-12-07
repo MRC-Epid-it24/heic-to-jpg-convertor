@@ -13,5 +13,7 @@
       "outDir": "dist"
   },
   "include": ["src"],
-  "exclude": ["node_modules", "**/*.spec.ts"]
+  "exclude": ["node_modules", "**/*.spec.ts"],
+  "compileOnSave": false,
+  "lib": ["ES2022"]
 }
