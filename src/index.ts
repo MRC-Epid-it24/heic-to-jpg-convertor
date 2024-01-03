@@ -1,4 +1,4 @@
-import { traverseDirectory } from './convertHeicToJpg';
+import { traverseDirectory } from './convertImages';
 
 // Parsing command-line arguments
 const rootDirectoryArg = process.argv.find(arg => arg.startsWith('--input-folder='));
