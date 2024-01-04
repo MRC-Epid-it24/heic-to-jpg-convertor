@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node dist/index.js",
-    "build": "tsc --project tsconfig.json",
+    "start": "node dist/src/index.js",
+    "build": "pnpm build:clean && tsc --project tsconfig.json",
+    "build:clean": "rimraf dist",
     "dev": "ts-node-dev --respawn --transpileOnly ./src/index.ts"
   },
   "keywords": [],
@@ -25,8 +26,10 @@
   },
   "dependencies": {
     "@img/sharp-darwin-arm64": "^0.33.0",
+    "commander": "^11.1.0",
     "heic-convert": "^2.1.0",
     "mkdirp": "^3.0.1",
+    "rimraf": "^5.0.5",
     "sharp": "^0.33.0"
   }
 }

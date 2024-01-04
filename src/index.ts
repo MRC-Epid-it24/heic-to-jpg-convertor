@@ -1,14 +1,87 @@
-import { traverseDirectory } from './convertImages';
+import { Argument, Command, Option } from "commander";
+import * as process from "process";
+import { traverseDirectory } from "./convertImages";
+import { generateAsServed } from "./generateAsServed";
+import pkg from "../package.json";
 
-// Parsing command-line arguments
-const rootDirectoryArg = process.argv.find(arg => arg.startsWith('--input-folder='));
-const rootDirectory = rootDirectoryArg ? rootDirectoryArg.split('=')[1] : './input';
-const deleteOriginal = process.argv.includes('--delete-original');
-const outputFolderArg = process.argv.find(arg => arg.startsWith('--output-folder='));
-const outputFolder = outputFolderArg ? outputFolderArg.split('=')[1] : rootDirectory;
-const maxWidthArg = process.argv.find(arg => arg.startsWith('--max-width='));
-const maxWidth = maxWidthArg ? parseInt(maxWidthArg.split('=')[1]) : null;
-const qualityArg = process.argv.find(arg => arg.startsWith('--quality='));
-const quality = qualityArg ? parseInt(qualityArg.split('=')[1]) : 80; // Default quality is 80
+const run = async () => {
+  const program = new Command();
 
-traverseDirectory(rootDirectory, rootDirectory, outputFolder, deleteOriginal, maxWidth, quality).then(() => console.log('Conversion completed.'));
+  program.name("Intake24 CLI");
+  program.version(pkg.version);
+
+  program
+    .command("convert-images")
+    .description("Convert HEIC images to JPEG")
+    .requiredOption(
+      "--input-folder <path>",
+      "Path to the folder containing HEIC images"
+    )
+    .option(
+      "--output-folder <path>",
+      "Path to the folder where converted images will be stored. Defaults to the input folder."
+    )
+    .option(
+      "--delete-original",
+      "Delete original HEIC images after conversion",
+      false
+    )
+    .option(
+      "--max-width <number>",
+      "Maximum width of the converted images. Defaults to the original width."
+    )
+    .option(
+      "--quality <number>",
+      "JPEG quality. Defaults to 80.",
+      (value) => parseInt(value),
+      80
+    )
+    .action(async (options) => {
+      await traverseDirectory(
+        options.inputFolder,
+        options.inputFolder,
+        options.outputFolder ?? options.inputFolder,
+        options.deleteOriginal,
+        options.maxWidth.length > 0 ? parseInt(options.maxWidth) : null,
+        options.quality.length > 0 ? parseInt(options.quality) : null
+      );
+      console.log("Conversion completed.");
+    });
+
+  program
+    .command("generate-as-served")
+    .description("Generate as served JSON array from the given folder)")
+    .requiredOption(
+      "--input-folder <path>",
+      "Path to the folder containing images"
+    )
+    .requiredOption(
+      "--generation-method <method>",
+      "Please select the generation method. Options are: 'name-based', 'csv-based', 'json-based'"
+    )
+    .option(
+      "--output-folder <path>",
+      "Path to the folder where JSON will be stored. Defaults to the input folder."
+    )
+    .action(async (options) => {
+      await generateAsServed(
+        options.inputFolder,
+        options.generationMethod,
+        options.outputFolder ?? options.inputFolder
+      );
+      console.log("Generation completed.");
+    });
+
+    await program.parseAsync(process.argv);
+};
+
+// Run the program
+run()
+  .catch((err) => {
+    console.error(err instanceof Error ? err.stack : err);
+
+    process.exit(process.exitCode ?? 1);
+  })
+  .finally(() => {
+    process.exit(process.exitCode ?? 0);
+  });

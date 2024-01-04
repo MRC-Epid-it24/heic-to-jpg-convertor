@@ -31,7 +31,11 @@ async function convertHeicToJpg(
     image = image.resize(maxWidth);
   }
 
-  const outputBuffer = await image.jpeg({ quality }).toBuffer();
+  if (quality) {
+    image = image.jpeg({ quality });
+  }
+
+  const outputBuffer = await image.toBuffer();
 
   await mkdirp(path.dirname(outputPath));
   await fs.promises.writeFile(outputPath, outputBuffer);
@@ -43,11 +47,11 @@ async function convertHeicToJpg(
 }
 
 /*
-* This function resizes a JPEG image.
-* It will also delete the original JPEG image if deleteOriginal is true.
-* It will also resize the image to a maximum width if maxWidth is set.
-* It will also set the JPEG quality to the given value.
-*/
+ * This function resizes a JPEG image.
+ * It will also delete the original JPEG image if deleteOriginal is true.
+ * It will also resize the image to a maximum width if maxWidth is set.
+ * It will also set the JPEG quality to the given value.
+ */
 async function resizeJpgImage(
   inputPath: string,
   outputPath: string,
@@ -61,7 +65,11 @@ async function resizeJpgImage(
     image = image.resize(maxWidth);
   }
 
-  const outputBuffer = await image.jpeg({ quality }).toBuffer();
+  if (quality) {
+    image = image.jpeg({ quality });
+  }
+
+  const outputBuffer = await image.toBuffer();
 
   await mkdirp(path.dirname(outputPath));
   await fs.promises.writeFile(outputPath, outputBuffer);
@@ -78,7 +86,7 @@ export async function traverseDirectory(
   outputDirectory: string,
   deleteOriginal: boolean,
   maxWidth: number | null = null,
-  quality: number = 80
+  quality: number | null = 80
 ) {
   const filesAndDirectories = await fs.promises.readdir(directory);
 
@@ -86,15 +94,15 @@ export async function traverseDirectory(
     const fullPath = path.join(directory, fileOrDirectory);
     const stat = await fs.promises.stat(fullPath);
 
-    if (stat.isDirectory()) {~
-      await traverseDirectory(
+    if (stat.isDirectory()) {
+      (await traverseDirectory(
         fullPath,
         baseDirectory,
         outputDirectory,
         deleteOriginal,
         maxWidth,
         quality
-      );
+      ));
     } else if (path.extname(fullPath).toLowerCase() === ".heic") {
       const relativePath = path
         .relative(baseDirectory, fullPath)
