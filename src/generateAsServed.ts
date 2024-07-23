@@ -16,8 +16,21 @@ type OutputObject = {
 
 // Generate a unique ID - placeholder function
 const generatedId = function (): string {
-  return "MY_" + Math.random().toString(36).substring(2, 15);
+  return Math.random().toString(36).substring(2, 8);
 };
+
+// Function to transform the description
+const transformDescription = (description: string): string => {
+    let nameParts = description.split(/[\s_()]/);
+    let transformedDescription = '';
+    for (let i = 0; i < nameParts.length && i < 2; i++) {
+      if (!/^[a-zA-Z]+$/.test(nameParts[i])) {
+        break;
+      }
+      transformedDescription += (i > 0 ? '_' : '') + nameParts[i];
+    }
+    return transformedDescription;
+  };
 
 const structure = async function traverseDirectory(inputFolder: string) {
   const filesAndDirectories = await fs.promises.readdir(inputFolder);
@@ -63,7 +76,7 @@ const transform = (input: InputObject[]): OutputObject[] => {
   input.forEach((item) => {
     if (item.type === "folder") {
       output.push({
-        id: generatedId(), // Replace with your ID generation logic
+        id: 'MY_' + transformDescription(item.name) + '_' + generatedId(), // Replace with your ID generation logic
         description: item.name,
         selectionImagePath: "", // Set this based on your logic
         images:

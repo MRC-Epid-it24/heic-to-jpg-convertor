@@ -16,14 +16,31 @@ async function convertHeicToJpg(
   deleteOriginal: boolean,
   maxWidth: number | null = null,
   quality: number = 80
-) {
-  const inputBuffer = await fs.promises.readFile(inputPath);
+): Promise<string | null> {
 
-  // First convert HEIC to a temporary JPEG buffer
-  const tempJpegBuffer = await convert({
-    buffer: inputBuffer, // input buffer with a HEIC image
-    format: "JPEG", // output format
-  });
+  const error: string | null = null
+  let inputBuffer: Buffer | null | undefined = null;
+  let tempJpegBuffer: Buffer | null | undefined = null;
+
+  try {
+    inputBuffer = await fs.promises.readFile(inputPath);
+
+    // First convert HEIC to a temporary JPEG buffer
+    tempJpegBuffer = await convert({
+      buffer: inputBuffer, // input buffer with a HEIC image
+      format: "JPEG", // output format
+    });
+
+  } catch (error) {
+    console.error(`Error reading file: ${inputPath}`);
+    console.error(error);
+    return `Error reading file: ${inputPath}`;
+  }
+
+  if (!tempJpegBuffer || !Buffer.isBuffer(tempJpegBuffer)) {
+    console.error(`Buffer for  ${inputPath} is empty or not a buffer`);
+    return;
+  }
 
   let image = sharp(tempJpegBuffer, { failOnError: false }).rotate();
 
@@ -89,6 +106,7 @@ export async function traverseDirectory(
   quality: number | null = 80
 ) {
   const filesAndDirectories = await fs.promises.readdir(directory);
+  const errorsLog: string[] = [];
 
   for (const fileOrDirectory of filesAndDirectories) {
     const fullPath = path.join(directory, fileOrDirectory);
@@ -111,13 +129,16 @@ export async function traverseDirectory(
       const jpgPath = path.join(outputDirectory, relativePath);
       await mkdirp(path.dirname(jpgPath));
       console.log(`Converting ${fullPath} to ${jpgPath}...`);
-      await convertHeicToJpg(
+      const result = await convertHeicToJpg(
         fullPath,
         jpgPath,
         deleteOriginal,
         maxWidth,
         quality
       );
+      if (result) {
+        errorsLog.push(result);
+      }
     } else if (
       path.extname(fullPath).toLowerCase() === ".jpg" ||
       path.extname(fullPath).toLowerCase() === ".jpeg"
@@ -134,5 +155,10 @@ export async function traverseDirectory(
         quality
       );
     }
+  }
+
+  if (errorsLog.length > 0) {
+    console.error("Errors:");
+    errorsLog.forEach((error) => console.warn(error));
   }
 }
