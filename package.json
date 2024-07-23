@@ -15,21 +15,22 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^20.10.3",
-    "@typescript-eslint/eslint-plugin": "^6.13.2",
-    "@typescript-eslint/parser": "^6.13.2",
-    "eslint": "^8.55.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.0.1",
-    "prettier": "^3.1.0",
-    "ts-node-dev": "^1.1.8",
-    "typescript": "^5.3.3"
+    "@typescript-eslint/eslint-plugin": "7.17.0",
+    "@typescript-eslint/parser": "7.17.0",
+    "eslint": "9.7.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-prettier": "5.2.1",
+    "prettier": "3.3.3",
+    "ts-node-dev": "2.0.0",
+    "typescript": "5.5.4"
   },
   "dependencies": {
-    "@img/sharp-darwin-arm64": "^0.33.0",
-    "commander": "^11.1.0",
+    "@img/sharp-darwin-arm64": "0.33.4",
+    "commander": "12.1.0",
     "heic-convert": "^2.1.0",
     "mkdirp": "^3.0.1",
-    "rimraf": "^5.0.5",
-    "sharp": "^0.33.0"
-  }
+    "rimraf": "6.0.1",
+    "sharp": "0.33.4"
+  },
+  "packageManager": "pnpm@9.4.0+sha512.f549b8a52c9d2b8536762f99c0722205efc5af913e77835dbccc3b0b0b2ca9e7dc8022b78062c17291c48e88749c70ce88eb5a74f1fa8c4bf5e18bb46c8bd83a"
 }
